@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search • Koko</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- reuse your same header here -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="/" class="logo"><img src="assets/logos/babytiger.png" alt="Koko baby tiger logo"/></a>
+      <div class="nav-center">
+        <nav class="main-nav">
+          <ul>
+            <li><a href="index.html">HOME</a></li>
+            <li><a href="menu.html">MENU</a></li>
+            <li><a href="location.html">LOCATION</a></li>
+            <li><a href="contact.html">CONTACT</a></li>
+          </ul>
+        </nav>
+        <form class="nav-search-form" action="search.html" role="search">
+          <input type="search" class="nav-search" name="q" placeholder="Search…" aria-label="Search site"/>
+        </form>
+      </div>
+      <div class="nav-right">
+        <a href="https://www.instagram.com/eatkoko.co/?hl=en" target="_blank" rel="noopener" aria-label="Instagram">
+          <img src="assets/icons/Instagram.png" alt="Instagram" class="nav-icon"/>
+        </a>
+        <a href="https://www.ubereats.com/ca/store/koko-japanese-eatery/v2n2s-fLUFajK1IIgFMmdw?srsltid=AfmBOooQx38epPySVjvlirUIBgheRHrNhUKoY4Lw600LXWlp9isM7NgP" target="_blank" rel="noopener" aria-label="Order on Uber Eats">
+          <img src="assets/icons/Uber.svg" alt="Uber Eats" class="nav-icon"/>
+        </a>
+      </div>
+      <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+    </div>
+  </header>
+
+  <main class="container" style="padding-block:2rem;">
+    <h1 style="text-align:center;margin:0 0 1rem;">Search results for <span id="search-query">…</span></h1>
+    <div id="search-results" class="search-results"></div>
+  </main>
+
+  
+
+    <script src="js/sticky-header.js" defer></script>
+    <script src="js/search.js" defer></script>
+    
+
+
+</body>
+</html>

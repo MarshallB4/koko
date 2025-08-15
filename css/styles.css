@@ -1,0 +1,1407 @@
+/* ==========================================================================
+   KOKO Stylesheet (organized)
+   Date: 2025-08-12
+
+   Table of Contents
+   00) Global Reset & Base
+   01) Font Faces (Aeonik)
+   02) Design Tokens (CSS Variables)
+   03) Generic Elements & Helpers
+   04) Header / Navigation
+   05) Hero
+   06) About
+   07) Banner Carousel
+   08) Location Page
+   09) Contact Page
+   10) Meet the Chef
+   11) Menu Page
+   12) Footer
+   ========================================================================== */
+
+/* ==========================================================================
+   00) GLOBAL RESET & BASE
+   ========================================================================== */
+/* Keep horizontal overflow hidden site-wide (matches existing behavior) */
+html, body { overflow-x: hidden; }
+
+/* Common element defaults */
+img { max-width: 100%; display: block; }
+a { text-decoration: none; }
+
+/* ==========================================================================
+   01) FONT FACES – AEONIK
+   (kept as provided; consider adding woff2 sources later for perf)
+   ========================================================================== */
+/* Regular */
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* Regular Italic */
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-RegularItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+/* Light */
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+/* Light Italic */
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-LightItalic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+/* Bold */
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+/* Bold Italic */
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ==========================================================================
+   02) DESIGN TOKENS (CSS VARIABLES)
+   - Added missing tokens used later (container width, spacing, inks, radii)
+   ========================================================================== */
+:root {
+  /* Typography */
+  --font-sans: 'Aeonik', sans-serif;
+
+  /* Primary colours */
+  --color-blue:      #5D8CC9;
+  --color-red:       #EC5554;
+  --color-yellow:    #FFE799;
+  --color-pink:      #FAC8D3;
+  --color-orange:    #FBAF5F;
+  --color-brown:     #D4A273;
+
+  /* Neutrals */
+  --color-off-white: #FFFBF2;
+  --color-white:     #FFFFFF;
+  --color-black:     #000000;
+
+  /* Added tokens referenced elsewhere */
+  --container-w: 1200px;                    /* generic container max width */
+  --space: clamp(16px, 2vw, 28px);          /* horizontal padding */
+  --radius-2xl: 18px;                       /* large radius used in cards/thumbs */
+  --ink-900: var(--color-black);            /* high-contrast text */
+  --ink-600: #5f5f5f;                       /* secondary text */
+  --bg-cream: var(--color-off-white);       /* for color-mix backgrounds */
+  --spacer: 0.8rem;                         /* gaps in nav */
+}
+
+/* Base body styles */
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-off-white);
+  color: var(--color-black);
+}
+
+/* ==========================================================================
+   03) GENERIC ELEMENTS & HELPERS
+   ========================================================================== */
+.container { max-width: var(--container-w); margin-inline: auto; padding-inline: var(--space); }
+
+/* ========================================================================== 
+   04) HEADER / NAVIGATION
+   ========================================================================== */
+.site-header{
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0;
+  z-index: 200;
+
+  /* size */
+  padding: 0.6rem 0;
+
+  /* glassy baseline for non-home pages */
+  background: color-mix(in srgb, var(--color-off-white) 10%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+
+  /* smooth transitions */
+  transition: background-color .18s ease, border-color .18s ease,
+              -webkit-backdrop-filter .18s ease, backdrop-filter .18s ease;
+}
+
+/* HOME: overlap hero and be fully transparent at the very top */
+.home .site-header{
+  position: absolute; top: 0; left: 0; right: 0;
+  background: transparent;
+  border: 0; box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* Fixed state (JS adds .is-fixed after 1px scroll) */
+.site-header.is-fixed{ position: fixed; left: 0; right: 0; top: 0; }
+
+/* HOME when fixed: switch back to glass */
+.home .site-header.is-fixed{
+  background: color-mix(in srgb, var(--color-off-white) 10%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+
+/* Avoid layout jump padding on non-home pages only */
+body:not(.home).has-fixed-header{ padding-top: var(--header-h, 0px); }
+
+/* If you use menu tabs, keep them tucked under the header */
+.menu-tabs { top: var(--header-h, 0px); }
+
+/* 3-column grid container with asymmetric gutters */
+.site-header > .nav-container{
+  max-width: none;
+  width: 100%;
+  box-sizing: border-box;
+
+  padding-left: clamp(12px, 3vw, 32px);
+  padding-right: max(clamp(24px, 4vw, 64px), env(safe-area-inset-right));
+
+  display: grid;
+  grid-template-columns: 1fr min(900px, 72vw) 1fr; /* left | centered | right */
+  align-items: center;
+  column-gap: 8px;
+}
+
+/* logo size */
+.site-header .logo img{ height: 56px; width: auto; }
+
+/* grid placement */
+.site-header .logo { grid-column: 1; justify-self: start; }
+.nav-center         { grid-column: 2; justify-self: center; display:flex; align-items:center; gap:1rem; }
+.nav-right          { grid-column: 3; justify-self: end; display:flex; align-items:center; gap: var(--spacer); margin-right:0; }
+
+/* pills: transparent by default; hover only changes text color */
+.main-nav ul { list-style: none; display: flex; gap: 1rem; }
+.main-nav a{
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--color-black);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.95rem;
+  background: transparent;
+  border-radius: 8px;
+  transition: color .2s ease, box-shadow .2s ease;
+}
+
+/* Hover/focus = text color only */
+.main-nav a:hover,
+.main-nav a:focus-visible{
+  color: var(--color-red);
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Current page stays as a filled pill (and stays filled on hover/focus) */
+.main-nav a[aria-current="page"],
+.main-nav a[aria-current="page"]:hover,
+.main-nav a[aria-current="page"]:focus-visible{
+  background: var(--color-red);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+/* search + icons */
+.nav-search{
+  padding: 0.35rem 0.75rem;
+  border: 2px solid var(--color-blue);
+  border-radius: 16px;
+  font-size: 0.85rem;
+  width: 160px;
+  transition: border-color 0.2s;
+}
+.nav-search:focus{ outline: none; border-color: var(--color-red); }
+
+.nav-right img{
+  width: 28px;
+  height: 28px;
+  filter: invert(0%);
+  transition: filter 0.2s ease;
+}
+
+
+
+/* mobile menu */
+.nav-toggle { display: none; }
+@media (max-width: 768px){
+  .nav-toggle { display: block; }
+  .nav-center{
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--color-pink);
+    flex-direction: column;
+    transform: translateY(-100%);
+    transition: transform .3s;
+    padding: 1rem;
+  }
+  .nav-center.open { transform: translateY(0); }
+  .main-nav ul { flex-direction: column; gap: .5rem; }
+  .nav-search { display: none; }
+  .nav-right  { display: none; }
+}
+
+
+
+/* ==========================================================================
+   05) HERO
+   ========================================================================== */
+.hero { position: relative; height: 80vh; overflow: hidden; background: none; }
+
+.hero-media {
+  position: absolute;
+  top: -100%; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 80%;
+  z-index: 0;
+  transform: scale(0.7); transform-origin: right center;
+  opacity: 0;
+  transition: top 1s ease-out, opacity 1s ease-out;
+}
+.hero-media.slide-down { top: 0; opacity: 1; }
+
+.hero-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0); z-index: 1; }
+.hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 1rem; top: 50%; left: 10%; transform: translateY(-50%); }
+.hero-logo { max-width: 600px; width: 100%; height: auto; }
+.hero-sublogo { max-width: 250px; width: 100%; height: auto; margin-left: 25px; }
+.hero-cta {
+  position: absolute; bottom: 0rem; right: 2rem; z-index: 2;
+  background: var(--color-black); color: var(--color-off-white);
+  padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 700; text-decoration: none;
+  transition: background 0.2s; margin-bottom: 1.5rem;
+}
+.hero-cta:hover { background: var(--color-yellow); color: var(--color-black); }
+
+/* Hide old hero <img> layers when using full-bleed background */
+.hero-media, .hero-content img { display: none !important; }
+
+/* Full-bleed hero background (kept zoom; note: non-standard) */
+.hero { background: url('../assets/images/herotest11.jpg') center/cover no-repeat; zoom: 120%; }
+/* NOTE: If Safari/Firefox issues appear with zoom, consider using a wrapper with transform:scale instead. */
+
+.hero {
+  position: relative;
+  min-height: clamp(420px, 62vh, 760px);
+  overflow: hidden;
+}
+.hero > img.hero-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+
+/* ==========================================================================
+   06) ABOUT
+   ========================================================================== */
+.about { background: var(--color-off-white); color: var(--color-black); padding-bottom: 0; }
+.about .container { text-align: center; }
+.about h2 { font-family: var(--font-sans); font-size: 4rem; margin-bottom: 4rem; padding-left: 5rem; }
+.about h3 { margin-bottom: 1rem; padding-left: 5rem; }
+.about p  { max-width: 1000px; margin: 0 auto; font-size: 1.5rem; line-height: 1.6; padding-left: 5rem; }
+
+.about-container { display: flex; align-items: center; gap: 2rem; padding: 4rem 1rem; margin-bottom: 3rem; }
+.about-content { flex: 1; max-width: 600px; text-align: left; }
+.about-content h2 { font-family: var(--font-sans); font-size: 3rem; margin-bottom: 1rem; line-height: 1.2; }
+.about-content p  { font-size: 1.25rem; line-height: 1.6; margin: 0; }
+.about-image { flex: 1; }
+.about-image img { width: 100%; height: auto; display: block; border-radius: 8px; object-fit: cover; }
+
+@media (max-width: 768px) {
+  .about-container { flex-direction: column; text-align: center; }
+  .about-content { max-width: none; }
+  .about-image   { margin-top: 2rem; }
+}
+
+/* --- Full-bleed About image + gentle zoom-out (keeps spacing unchanged) --- */
+:root { --about-zoom: 0.9; } /* try 0.92–0.99 for more/less zoom-out */
+
+.about-hero-test{
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.about-hero-test img{
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;        /* maintains 1920×1080 feel */
+  object-fit: cover;
+  transform: scale(var(--about-zoom));
+  transform-origin: center center;
+  transition: transform .25s ease; /* optional smooth tweak */
+}
+
+/* Don’t zoom on small screens */
+@media (max-width: 640px){
+  .about-hero-test img{ transform: none; }
+}
+
+
+/* ==========================================================================
+   07) BANNER CAROUSEL — contain images, gapless continuous scroll
+   ========================================================================== */
+.banner-carousel{
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-top: 3rem;
+
+  /* Controls */
+  --banner-h: 430px;            /* height of the band (make smaller/larger) */
+  --duration: 30s;              /* will be set by JS based on loop width */
+  --loop-w: 1000px;             /* will be set by JS to half the track width */
+}
+
+.carousel-container{ position: relative; }
+
+/* Track holds variable-width images side by side */
+.carousel-track{
+  display: flex;
+  align-items: center;
+  gap: 0;                       /* critical for no gaps */
+  will-change: transform;
+}
+
+/* Each slide uses its natural width at fixed height */
+.carousel-slide{
+  flex: 0 0 auto;               /* no forced width */
+  height: var(--banner-h);
+  width: auto;
+  object-fit: contain;          /* show full image */
+  display: block;
+  background: var(--color-off-white); /* “letterbox” color (matches page) */
+}
+
+/* no arrows in continuous mode */
+.carousel-nav{ display: none; }
+
+/* Scroll exactly one loop width (A+B) that JS measured */
+@keyframes bannerScroll{
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-1 * var(--loop-w))); }
+}
+.banner-carousel.is-ready .carousel-track{
+  animation: bannerScroll var(--duration) linear infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .banner-carousel.is-ready .carousel-track{ animation: none; }
+}
+
+/* container stays the same */
+.carousel-cta{
+  text-align: center;
+  margin: 1.25rem auto 2.25rem;
+}
+
+/* make the button bigger */
+.carousel-cta .menu-cta{
+  display: inline-block;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 1.075rem;      /* bigger text */
+  line-height: 1;           /* tidy pill height */
+  padding: 0.95rem 1.75rem; /* bigger pill */
+  border-radius: 999px;     /* pill shape */
+  border-width: 3px;        /* slightly bolder outline (keeps your existing color) */
+  border-style: solid;
+}
+
+/* scale up a touch more on larger screens */
+@media (min-width: 900px){
+  .carousel-cta .menu-cta{
+    font-size: 1.15rem;
+    padding: 1.05rem 2rem;
+    border-width: 3px;
+  }
+}
+
+
+/* ==========================================================================
+   08) LOCATION PAGE — tidy version
+   ========================================================================== */
+
+.location-page { overflow-x: hidden; }
+
+/* Page tones */
+:root{
+  --loc-card-bg: color-mix(in srgb, var(--color-off-white) 88%, white 12%);
+  --loc-shadow: 0 10px 24px rgba(0,0,0,.06), 0 1px 0 rgba(0,0,0,.03);
+  --loc-line: #eae3d8;
+}
+
+/* Container rhythm (matches site) */
+.location-page .container{
+  width: min(1200px, 92vw);
+  margin-inline: auto;
+  padding-inline: clamp(14px, 3vw, 24px);
+}
+
+/* ── Hero (logo/address + map) ─────────────────────────────────────────── */
+.loc-hero{
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: clamp(22px, 3.5vw, 40px);
+  align-items: start;
+  margin-top: clamp(16px, 2.5vw, 28px);
+  margin-bottom: clamp(28px, 5vw, 56px);
+}
+
+.brand-card{
+  width: 240px;
+  height: 240px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1rem;
+}
+.brand-card img{ max-width: 115%; height: auto; }
+
+.address-block{
+  background: var(--loc-card-bg);
+  border-radius: 18px;
+  box-shadow: var(--loc-shadow);
+  padding: 1rem 1.25rem;
+  line-height: 1.55;
+}
+.address-block h3{
+  display: inline-block;
+  margin: 0 0 .6rem 0;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  background: var(--color-red);
+  color: #fff;
+  font: 700 .82rem/1 var(--font-sans, system-ui, sans-serif);
+  letter-spacing: .06em;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  text-transform: none;
+}
+
+.loc-map{
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--loc-shadow);
+}
+.loc-map iframe{ width: 100%; height: 380px; border: 0; display: block; }
+
+/* Divider */
+.loc-divider{
+  width: min(1200px, 92vw);
+  margin: clamp(28px, 4vw, 44px) auto;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--loc-line) 70%, transparent);
+}
+
+/* ── Row: Hours left; Parking/Transit stacked right, centered ─────────── */
+.loc-row{
+  display: grid;
+  grid-template-columns: minmax(340px, 1fr) minmax(340px, 1fr);
+  column-gap: clamp(14px, 2.2vw, 24px);
+  row-gap: 0;                       /* left card aligns with stacked right */
+  align-items: stretch;
+  justify-content: center;
+  max-width: 1100px;
+  margin: clamp(24px, 4vw, 48px) auto;
+}
+
+.hours--row{ margin: 0; display: contents; } /* wrapper stays out of grid */
+
+.loc-row .hours-card{
+  grid-column: 1;
+  grid-row: 1 / span 2;             /* fills left side vertically */
+  align-self: stretch;
+  height: auto;
+  padding: 16px 18px;
+  border-radius: 18px;
+  box-shadow: var(--loc-shadow);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-off-white) 94%, white 6%) 0%,
+    color-mix(in srgb, var(--color-off-white) 98%, white 2%) 100%
+  );
+}
+
+/* Red pill titles for Hours + Parking + Transit */
+.loc-row .hours-title,
+.loc-row .info-card h4{
+  display: inline-block;
+  margin: 0 0 .65rem 0;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  background: var(--color-red);
+  color: #fff;
+  font: 800 .82rem/1 var(--font-sans, system-ui, sans-serif);
+  letter-spacing: .06em;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+/* Small info cards (Parking/Transit) on right */
+.info-card{
+  grid-column: 2;
+  background: var(--loc-card-bg);
+  border-radius: 18px;
+  box-shadow: var(--loc-shadow);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.info-card + .info-card{            /* space between Parking and Transit */
+  margin-top: clamp(14px, 2.2vw, 24px);
+}
+.loc-row .info-card p{
+  margin: 0;
+  max-width: 48ch;
+  line-height: 1.55;
+  color: var(--ink-700, rgba(0,0,0,.78));
+}
+
+/* Hours table inside the card */
+.loc-row .hours-table{
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: clamp(16px, 2vw, 24px);
+  row-gap: .35rem;
+  padding: 0;
+  margin-top: 1rem;
+}
+.loc-row .hours-table .col{ display: grid; gap: .35rem; font-size: .98rem; }
+.loc-row .hours-table .col-times span{ font-variant-numeric: tabular-nums; }
+
+/* ── Store photos ─────────────────────────────────────────────────────── */
+.store-photos{ margin: clamp(28px, 6vw, 84px) auto clamp(40px, 8vw, 96px); }
+.photo-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 2vw, 16px);
+}
+.photo-grid img{
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: var(--loc-shadow);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 1100px){
+  .loc-row{
+    grid-template-columns: 1fr;     /* stack Hours, Parking, Transit */
+  }
+  .loc-row .hours-card{
+    grid-column: 1;
+    grid-row: auto;
+    height: auto;
+  }
+  .info-card{ grid-column: 1; }
+}
+@media (max-width: 1024px){
+  .loc-hero{ grid-template-columns: 300px 1fr; }
+  .loc-map iframe{ height: 360px; }
+}
+@media (max-width: 820px){
+  .loc-hero{ grid-template-columns: 1fr; }
+  .photo-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px){
+  .photo-grid{ grid-template-columns: 1fr; }
+}
+
+
+
+/* ==========================================================================
+   09) CONTACT PAGE (refined)
+   ========================================================================== */
+
+/* Keep the page a bit narrower but roomy */
+.contact-page .container { 
+  width: min(1040px, 92vw); 
+  margin-inline: auto; 
+}
+
+/* Hero */
+.contact-hero img { 
+  width: 100%; 
+  height: clamp(240px, 32vw, 360px); 
+  object-fit: cover; 
+  border-radius: 16px; 
+  display: block; 
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  margin: 24px 0 12px;
+}
+
+/* Contact info */
+.contact-info { margin: 10px 0 8px; }
+.contact-info h3 { 
+  margin: 0 0 10px; 
+  font: 700 1rem var(--font-sans, system-ui, sans-serif); 
+  letter-spacing: .02em; 
+}
+.contact-info-card { 
+  background: var(--color-white); 
+  border-radius: 16px; 
+  padding: 14px 18px; 
+  box-shadow: 0 10px 26px rgba(0,0,0,.06); 
+  display: grid; 
+  grid-template-columns: 120px 1fr; 
+  gap: 6px 14px; 
+}
+.contact-info-card p { margin: 0; opacity: .75; }
+.contact-phone { color: var(--color-black); font-weight: 700; text-decoration: none; }
+.contact-phone:hover { text-decoration: underline; }
+
+/* Form card */
+.contact-form { 
+  margin: 18px auto 40px; 
+  background: var(--color-white);        /* pop against off-white page bg */
+  border-radius: 18px; 
+  padding: 22px 18px 24px; 
+  box-shadow: 0 18px 40px rgba(0,0,0,.08);
+}
+.contact-form h3 { 
+  margin: 4px 0 16px; 
+  font-size: .98rem; 
+  text-align: center; 
+  font-weight: 600; 
+  color: var(--color-black); 
+}
+
+/* Grid — prevent overflow & overlap */
+#contactForm { 
+  display: grid; 
+  grid-template-columns: repeat(2, minmax(0, 1fr)); 
+  gap: 14px 16px; 
+  align-items: start; 
+}
+#contactForm label, 
+#contactForm input, 
+#contactForm textarea, 
+#contactForm button { min-width: 0; box-sizing: border-box; }
+#contactForm label { display: grid; gap: 6px; font-size: .9rem; color: rgba(0,0,0,.75); }
+
+/* Inputs */
+#contactForm input, 
+#contactForm textarea { 
+  width: 100%; 
+  border: 1px solid rgba(0,0,0,.14); 
+  border-radius: 12px; 
+  padding: 11px 14px; 
+  font: 400 .95rem var(--font-sans, system-ui, sans-serif); 
+  background: var(--color-off-white); 
+  color: var(--color-black); 
+}
+#contactForm textarea { resize: vertical; min-height: 140px; }
+
+/* Placeholder tone */
+#contactForm ::placeholder { color: rgba(0,0,0,.45); }
+
+/* Focus ring (kept fallback + modern) */
+#contactForm input:focus, 
+#contactForm textarea:focus {
+  outline: none; 
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px rgba(93, 140, 201, 0.25);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-blue) 28%, transparent);
+  background: var(--color-white);
+}
+
+/* Full-width fields */
+#contactForm .full, 
+#contactForm .span-2 { grid-column: 1 / -1; }
+
+/* Submit button — brand blue */
+#contactForm .btn { 
+  grid-column: 1 / -1; 
+  justify-self: center; 
+  padding: .75rem 2.2rem; 
+  border: none; 
+  border-radius: 999px; 
+  font-weight: 700; 
+  cursor: pointer; 
+  background: var(--color-blue); 
+  color: #fff; 
+  transition: transform .05s ease, filter .2s ease; 
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+#contactForm .btn:hover { filter: brightness(1.06); }
+#contactForm .btn:active { transform: translateY(1px); }
+#contactForm .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Status text */
+.form-msg { 
+  grid-column: 1 / -1; 
+  text-align: center; 
+  margin: 6px 0 0; 
+  font-size: .92rem; 
+  min-height: 1.2em; 
+  color: var(--color-black); 
+}
+.form-msg.is-success { color: #1a7f37; }
+.form-msg.is-error   { color: #b42318; }
+
+/* Mobile */
+@media (max-width: 720px){
+  #contactForm { grid-template-columns: 1fr; }
+}
+
+
+
+/* ========================================================================== 
+   10) MEET THE CHEF — same size as before, aligned to footer container
+   ========================================================================== */
+.chef{
+  background: var(--bg-page, #FFFBF2);
+  /* only bottom spacing */
+  padding: 0 0 clamp(2.5rem, 6vw, 5rem);
+}
+
+/* match footer container (1200px + 1rem sides) */
+.chef .container{
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+/* copy left, photo right; keep proportions tight */
+.chef-grid{
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: clamp(1.25rem, 4vw, 3rem);
+  align-items: start;   /* same feel as your original */
+}
+
+/* text stays on the left edge */
+.chef-copy{
+  font-family: var(--font-sans, system-ui);
+  color: var(--color-black, #000);
+  justify-self: start;
+}
+/* text stays on the left edge */
+.chef-copy{
+  font-family: var(--font-sans, system-ui);
+  color: var(--color-black, #000);
+  justify-self: start;
+}
+
+/* Make "Meet our Chef" a red pill — on its own line */
+.chef-copy .eyebrow{
+  /* reset old heading styles */
+  padding-top: 0;
+  font-size: .92rem;
+
+  /* pill look */
+  display: block;                /* force its own line */
+  width: -moz-fit-content;       /* Firefox */
+  width: fit-content;            /* shrink to text */
+  padding: .42rem .9rem;
+  border-radius: 999px;
+  background: var(--color-red);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 1;
+  margin: 0 0 .75rem 0;          /* gap before "Chef Jun" */
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+/* Ensure the element after the pill (e.g., "Chef Jun") starts on a new line */
+.chef-copy .eyebrow + *{
+  display: block;
+}
+
+/* If your "Chef Jun" label uses .chef-note, keep it block-level */
+.chef-note{
+  display: block;
+  margin: .15rem 0 1rem;
+}
+
+
+.chef-copy p{
+  margin: 0;
+  max-width: 66ch;
+  font-size: 1.25rem;
+  line-height: 1.65;
+}
+.chef-copy p:first-of-type{ margin-top: 0; }
+
+/* photo hugs the right edge but uses your original size cap */
+.chef-photo{
+  justify-self: end;                       /* right align within the grid */
+  width: 100%;
+  max-width: clamp(175px, 30vw, 400px);    /* <-- restored original scale */
+}
+.chef-photo img{
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* title + name note (unchanged) */
+.chef-title{ margin: 0 0 .25rem; line-height: 1.2; }
+.chef-note{
+  display: inline-block;
+  font: 700 .95rem var(--font-sans, system-ui, sans-serif);
+  letter-spacing: .01em;
+  color: var(--color-black);
+  opacity: .85;
+  margin: .15rem 0 1rem;
+}
+
+/* mobile */
+@media (max-width: 900px){
+  .chef-grid{ grid-template-columns: 1fr; }
+  .chef-photo{
+    order: -1;
+    justify-self: center;
+    max-width: 320px;
+    width: 100%;
+  }
+}
+
+/* Center the text block against the image */
+.chef-grid{
+  align-items: center;          /* was start */
+}
+.chef-copy{
+  align-self: center;           /* make sure the copy centers even if grid changes */
+}
+
+/* Nudge the whole section horizontally to line up with the footer (desktop only) */
+@media (min-width: 901px){
+  .chef .container{
+    transform: translateX(2rem);   /* tweak this value if you need a hair more/less */
+  }
+}
+/* No nudge on small screens */
+@media (max-width: 900px){
+  .chef .container{ transform: none; }
+}
+
+/* Chef social icon under the copy */
+.chef-social{
+  margin-top: 0.9rem;            /* space under the paragraph */
+}
+
+.chef-ig{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 2px solid var(--color-black);
+  background: var(--color-off-white);
+  transition: background .2s ease, transform .12s ease, filter .2s ease;
+}
+
+.chef-ig img{
+  width: 20px;
+  height: 20px;
+  display: block;
+  /* use same filter behavior as your header icons */
+  filter: invert(0%);
+  transition: filter .2s ease;
+}
+
+.chef-ig:hover{
+  background: var(--color-red);
+  transform: translateY(-1px);
+}
+
+.chef-ig:hover img{
+  filter: invert(100%);          /* white icon on red hover */
+}
+
+.chef-ig:active{
+  transform: translateY(0);
+}
+
+
+
+/* ==========================================================================
+   11) MENU PAGE (no alternating)
+   ========================================================================== */
+.menu { padding-bottom: 8rem; }
+.menu .container { max-width: 1200px; }
+
+/* Safe defaults until JS measures */
+:root{
+  --header-h: 72px;   /* JS overwrites */
+  --tabs-h: 46px;     /* JS overwrites if .menu-tabs exists */
+}
+
+/* Page background + glass blend */
+.menu-page{
+  --bg-page: var(--color-off-white);
+  --bg-cream: var(--bg-page);
+  background: var(--bg-page);
+}
+.menu-page .site-header{
+  background: color-mix(in srgb, var(--bg-page) 10%, transparent);
+}
+
+/* ----- Category bar: flows by default; JS toggles .is-fixed ----- */
+.menu-tabs{
+  position: relative;                 /* no sticky here to avoid snap */
+  z-index: 150;
+  margin: 0;                          /* stop margin-collapse snap */
+  background: color-mix(in srgb, var(--bg-page) 8%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+
+/* Fixed state: attach directly under the main header */
+.menu-tabs.is-fixed{
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + var(--header-h, 72px));
+  left: 0; right: 0;
+}
+
+/* While fixed, give the content matching top padding so nothing jumps */
+.menu.with-tabs-fixed{ padding-top: var(--tabs-h, 46px); }
+
+/* keep chips centered and width-aligned with content */
+.menu-tabs .container{
+  max-width: 1200px;              /* match .menu .container */
+  margin-inline: auto;
+  display: flex;
+  justify-content: center;
+  gap: .5rem;
+  overflow-x: auto;
+  padding-block: .65rem;          /* contributes to --tabs-h */
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* Chips = match header: hover text only, active = filled pill */
+.menu-tabs a{
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--color-black);
+  background: transparent;
+  border-radius: 999px;
+  padding: .5rem .9rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  border: 1px solid transparent;
+  transition: color .2s, background .2s, box-shadow .2s;
+}
+.menu-tabs a:hover,
+.menu-tabs a:focus-visible{
+  color: var(--color-red);
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+}
+.menu-tabs a.active,
+.menu-tabs a[aria-current="page"],
+.menu-tabs a[aria-current="true"]{
+  background: var(--color-red);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+/* Sections offset = header + tabs */
+.menu-section{
+  scroll-margin-top: calc(var(--header-h, 72px) + var(--tabs-h, 46px));
+  padding-block: clamp(32px, 6vw, 72px);
+}
+.menu-section h2{
+  font-size: clamp(28px, 3.2vw, 40px);
+  text-align: center;
+  margin: 0 0 1.25rem;
+  letter-spacing: .02em;
+}
+.section-note, .group-price{
+  text-align: center;
+  color: var(--ink-600, rgba(0,0,0,.65));
+  margin-bottom: .4rem;
+  font-weight: 700;
+}
+.section-subnote{
+  text-align: center;
+  color: var(--ink-600, rgba(0,0,0,.65));
+  margin-bottom: 2rem;
+  font-size: .95rem;
+}
+
+/* Grid */
+.menu-grid{
+  display: grid;
+  gap: clamp(24px, 3vw, 40px);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 920px){
+  .menu-grid{ grid-template-columns: 1fr 1fr; }
+}
+
+/* Items */
+.menu-item{
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: center;
+  gap: 18px;
+}
+@media (min-width: 1100px){
+  .menu-item{ grid-template-columns: 220px 1fr; }
+}
+.thumb{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-2xl, 18px);
+  overflow: hidden;
+  background: #FFFBF2;
+  border: 1px solid #FFFBF2;
+  display: flex; align-items: center; justify-content: center;
+}
+.thumb img{ width: 88%; height: auto; }
+.info{ position: relative; padding-right: 88px; }
+.title{ font-weight: 800; font-size: clamp(18px, 2.1vw, 22px); margin: 0 0 .35rem; }
+.desc{ margin: 0; color: var(--ink-600, rgba(0,0,0,.65)); font-size: .98rem; line-height: 1.45; }
+.price{ position: absolute; right: 0; top: 0; font-weight: 800; letter-spacing: .02em; }
+.group-price{ margin-top: -.25rem; }
+
+
+
+
+/* ========================================================================== 
+   12) FOOTER
+   ========================================================================== */
+.site-footer { background: var(--color-off-white); color: var(--color-black); padding: 4rem 1rem; }
+.site-footer .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; }
+.site-footer .logo { flex: 1 1 400px; }
+.site-footer .logo img { height: 120px; width: auto; }
+
+.site-footer .footer-nav { flex: 2 1 400px; display: flex; gap: 1rem; justify-content: center; }
+
+/* pills like header: default transparent, hover = text only, active = filled */
+.site-footer .footer-nav a{
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--color-black);
+  background: transparent;                 /* no background by default */
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+/* hover/focus: text turns red, no fill */
+.site-footer .footer-nav a:hover,
+.site-footer .footer-nav a:focus-visible{
+  color: var(--color-red);
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+/* current page: solid pill (and stays filled on hover/focus) */
+.site-footer .footer-nav a[aria-current="page"],
+.site-footer .footer-nav a[aria-current="page"]:hover,
+.site-footer .footer-nav a[aria-current="page"]:focus-visible{
+  background: var(--color-red);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+.site-footer .social { flex: 1 1 200px; display: flex; gap: 1rem; justify-content: flex-end; }
+.site-footer .social a img { width: 32px; height: 32px; }
+.site-footer .bottom-bar { width: 100%; border-top: 1px solid #ddd; margin-top: 2rem; padding-top: 1rem; text-align: center; font-size: 0.875rem; color: var(--color-black); }
+
+
+/* ==========================================================================
+   Additional CSS
+   ========================================================================== */
+
+
+   /* Header is fixed on ALL non-home pages from the very start */
+body:not(.home) .site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+}
+
+/* Give the page its space so there's no jump */
+body:not(.home) {
+  padding-top: var(--header-h, 72px);
+}
+
+/* Menu tabs stay attached right under the header */
+.menu-tabs{
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + var(--header-h, 72px));
+  z-index: 150;
+}
+
+/* View Full Menu button (pill) */
+a.menu-cta:link,
+a.menu-cta:visited{
+  color: var(--color-black);
+  background: transparent;
+  border: 2px solid var(--color-blue);
+  text-decoration: none;
+}
+
+a.menu-cta:hover,
+a.menu-cta:focus-visible{
+  background: var(--color-red);
+  color: #fff;
+  border-color: var(--color-red);
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  outline: none;
+}
+
+/* Highlight inside titles/descriptions */
+mark[data-search]{
+  background: #fff3b0; /* soft yellow */
+  color: inherit;
+  padding: 0 .08em;
+  border-radius: .2em;
+}
+
+/* “X results for …” chip */
+.search-count-chip{
+  display: inline-block;
+  margin: 0 0 1rem 0;
+  padding: .45rem .8rem;
+  border-radius: 999px;
+  background: var(--color-red);
+  color: #fff;
+  font: 700 .82rem/1 var(--font-sans, system-ui, sans-serif);
+  letter-spacing: .04em;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+.nav-search-form { display: inline-flex; margin: 0; }
+
+/* Search results */
+.search-results { max-width: 900px; margin: 0 auto; }
+.search-results .search-sec {
+  margin: 2rem 0 .5rem;
+  font-size: .85rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  opacity: .8;
+}
+.search-results .search-list { list-style: none; padding: 0; display: grid; gap: .75rem; }
+.search-results .search-list a { font-weight: 800; }
+.search-results .search-list p { margin: .25rem 0 0; color: var(--ink-600, rgba(0,0,0,.65)); }
+
+
+/* Backdrop */
+.faq-backdrop {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+
+/* Toggle */
+.faq-backdrop.is-open { display: flex; }
+
+/* Dialog */
+.faq-dialog {
+  background: #fff;
+  max-width: 720px;
+  width: min(92vw, 720px);
+  max-height: 85vh;
+  overflow: auto;
+  border-radius: 16px;
+  padding: 20px 20px 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Close button */
+.faq-close {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  position: sticky;
+  top: 0;
+  float: right;
+  padding: 6px;
+}
+
+.faq-title {
+  margin: 8px 0 4px;
+  font-size: 1.5rem;
+}
+
+.faq-desc {
+  margin: 0 0 12px;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* FAQ items */
+.faq-list details {
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+}
+
+.faq-list summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  outline: none;
+}
+
+.faq-list summary::-webkit-details-marker { display: none; }
+
+.faq-list summary:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+}
+
+.faq-list details p {
+  margin: 8px 0 0;
+  line-height: 1.55;
+  color: #222;
+}
+
+/* Optional: body scroll lock while modal open */
+body.faq-lock {
+  overflow: hidden;
+  touch-action: none;
+}
+
+
+
+/* Base CTA pill — works for BOTH <a> and <button> */
+.menu-cta{
+  display:inline-block;
+  padding:10px 18px;
+  border-radius:9999px;
+  border:2px solid var(--color-blue);
+  background:transparent;
+  color:var(--color-black);
+  font-weight:700;
+  line-height:1;
+  text-decoration:none;       /* in case it's an <a> */
+  transition:filter .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+/* Match your homepage link states */
+a.menu-cta:link,
+a.menu-cta:visited{
+  color:var(--color-black);
+  background:transparent;
+  border-color:var(--color-blue);
+  text-decoration:none;
+}
+
+/* Hover/Focus (shared) */
+.menu-cta:hover,
+.menu-cta:focus-visible{
+  background:var(--color-red);
+  color:#fff;
+  border-color:var(--color-red);
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+  outline:none;
+}
+
+/* Button-specific resets so it looks like the link CTA */
+button.menu-cta{
+  -webkit-appearance:none;
+  appearance:none;
+  cursor:pointer;
+  font:inherit;
+}
+
+/* Optional: pressed + disabled */
+button.menu-cta:active{ transform:translateY(1px); }
+button.menu-cta:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Put the CTA centered on the contact form grid */
+.contact-form .menu-cta{
+  grid-column:1 / -1;
+  justify-self:center;
+}
+
+/* Base CTA pill — works for <a> and <button> */
+.menu-cta{
+  display:inline-block;
+  padding:10px 18px;
+  border-radius:9999px;
+  border:2px solid var(--color-blue);
+  background:transparent;
+  color:var(--color-black);
+  font-weight:700;
+  line-height:1;
+  text-decoration:none;
+  transition:filter .2s, box-shadow .2s, background .2s, color .2s, border-color .2s;
+}
+
+/* Anchor baseline (link/visited) */
+a.menu-cta{
+  color:var(--color-black);
+  background:transparent;
+  border-color:var(--color-blue);
+  text-decoration:none;
+}
+
+/* HOVER/FOCUS — KEEP THIS AFTER the block above */
+a.menu-cta:hover,
+a.menu-cta:focus-visible,
+.menu-cta:hover,
+.menu-cta:focus-visible{
+  background:var(--color-red);
+  color:#fff;
+  border-color:var(--color-red);
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+  outline:none;
+}
+
+/* Button resets so the form submit looks the same */
+button.menu-cta{
+  appearance:none;
+  cursor:pointer;
+  font:inherit;
+}
+button.menu-cta:active{ transform:translateY(1px); }
+
+/* Center the CTA on the contact form grid */
+.contact-form .menu-cta{
+  grid-column:1 / -1;
+  justify-self:center;
+}
